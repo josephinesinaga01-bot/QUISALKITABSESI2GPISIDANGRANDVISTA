@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis 50 Soal - GPI Sidang Grandvista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Quicksand:wght@500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* BACKGROUND HIJAU GRADASI & VIDEO */
+        .video-background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; overflow: hidden; background: #0f766e; }
+        .video-background video { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; } 
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(19, 78, 74, 0.2) 0%, rgba(15, 118, 110, 0.1) 100%); z-index: -1; }
+        
+        body { font-family: 'Quicksand', sans-serif; color: #1e293b; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+
+        /* KOTAK KACA SANGAT TRANSPARAN */
+        .container { 
+            background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            border: 3px solid rgba(20, 184, 166, 0.7); 
+            width: 100%; 
+            max-width: 750px; 
+            padding: 30px 25px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            text-align: center; position: relative; z-index: 1; 
+        }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeInUp 0.5s ease-out; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* TEKS UTAMA */
+        .header-logo h2 { 
+            font-family: 'Cinzel', serif; color: #ffffff; font-size: 1.4rem; 
+            letter-spacing: 2px; margin-bottom: 5px; font-weight: 700;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        }
+        .divider { width: 100px; height: 4px; background: #14b8a6; margin: 15px auto 20px auto; border-radius: 4px; }
+
+        .title { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: #ffffff; line-height: 1.2; margin-bottom: 10px; text-shadow: 1px 1px 5px rgba(0,0,0,0.6); }
+        .subtitle { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 25px; font-weight: 700; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        
+        /* INPUT & BUTTONS */
+        .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+        input { 
+            padding: 15px; border: 2px solid #99f6e4; 
+            border-radius: 12px; font-size: 1rem; text-align: center; outline: none; 
+            font-family: 'Quicksand', sans-serif; font-weight: 700; color: #1e293b; 
+            background: rgba(255, 255, 255, 0.95); 
+            transition: 0.3s; 
+        }
+        input:focus { border-color: #14b8a6; background: #FFF; box-shadow: 0 5px 15px rgba(20, 184, 166, 0.4); }
+        
+        .btn { padding: 16px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; font-family: 'Quicksand', sans-serif; letter-spacing: 1px; }
+        .btn-primary { background: #14b8a6; color: #fff; box-shadow: 0 5px 0 #0f766e; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #0f766e; }
+        .btn-primary:active { transform: translateY(5px); box-shadow: 0 0 0 #0f766e; }
+        
+        .btn-success { background: #0f766e; color: #fff; box-shadow: 0 5px 0 #115e59; margin-top: 20px; }
+        .btn-success:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #115e59; }
+        .btn-success:active { transform: translateY(5px); box-shadow: 0 0 0 #115e59; }
+        
+        .btn-music { background: rgba(255, 255, 255, 0.9); border: 2px solid #14b8a6; color: #0f766e; padding: 10px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-bottom: 25px; transition: 0.3s; font-family: 'Quicksand', sans-serif; }
+        .btn-music:hover { background: #14b8a6; color: #FFF; }
+
+        /* HEADER KUIS */
+        .header-quiz { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 15px; font-size: 0.85rem; }
+        .badge { padding: 8px 15px; border-radius: 12px; background: rgba(255, 255, 255, 0.9); color: #0f766e; border: 2px solid #99f6e4; }
+        
+        /* KOTAK AYAT */
+        .verse-box { background: rgba(15, 118, 110, 0.85); border-left: 5px solid #14b8a6; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .verse-box p { color: #f0fdfa; font-size: 0.85rem; font-style: italic; line-height: 1.4; }
+        .verse-box .verse-ref { color: #99f6e4; font-weight: 700; font-style: normal; margin-top: 5px; display: block; }
+
+        .question { font-size: 1.05rem; color: #1e293b; margin-bottom: 25px; line-height: 1.6; font-weight: 700; text-align: left; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 12px; border-left: 6px solid #14b8a6; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* KARTU REMI */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { perspective: 1000px; height: 160px; cursor: pointer; }
+        .card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .card:hover .card-inner { transform: translateY(-5px) scale(1.02); }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; }
+        
+        .card-front { 
+            background: rgba(255, 255, 255, 0.95); 
+            color: #1e293b; 
+            border: 3px solid #0f766e; 
+            box-shadow: 0 8px 20px rgba(15, 118, 110, 0.2); 
+            transition: 0.3s; text-align: left; 
+        }
+        .card:hover .card-front { border-color: #14b8a6; box-shadow: 0 12px 25px rgba(20, 184, 166, 0.3); }
+        
+        .letter-badge { 
+            position: absolute; top: -12px; left: -12px; 
+            background: #14b8a6; 
+            color: #FFF; width: 35px; height: 35px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.1rem; font-weight: 700; font-family: 'Quicksand', sans-serif; 
+            box-shadow: 0 5px 15px rgba(20, 184, 166, 0.4); z-index: 2; 
+            border: 2px solid #FFF;
+        }
+        
+        .option-text { font-size: 0.85rem; font-weight: 700; line-height: 1.4; padding-left: 5px; }
+        
+        .card-back { background: #F8FAFC; color: #0F172A; transform: rotateY(180deg); font-size: 4rem; border: 3px solid #cbd5e1; border-radius: 15px; }
+        .card.correct .card-back { background: #10B981; color: #fff; border-color: #059669; box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
+        .card.wrong .card-back { background: #ef4444; color: #fff; border-color: #dc2626; animation: shake 0.5s; box-shadow: 0 0 40px rgba(239, 68, 68, 0.6); }
+        
+        @keyframes shake { 0%, 100% { transform: rotateY(180deg) translateX(0); } 25% { transform: rotateY(180deg) translateX(-10px); } 75% { transform: rotateY(180deg) translateX(10px); } }
+
+        /* COUNTDOWN & OPINION BUTTONS */
+        #countdown-container { display: none; margin-top: 20px; }
+        .countdown-text { color: #f1f5f9; font-size: 1.2rem; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); margin-bottom: 10px; }
+        .countdown-number { font-size: 6rem; color: #14b8a6; font-weight: 700; text-shadow: 0 0 20px rgba(20, 184, 166, 0.8); line-height: 1; }
+        
+        .opinion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn-opinion { padding: 20px; font-size: 1.2rem; }
+        .btn-ya { background: #10B981; color: #fff; box-shadow: 0 5px 0 #059669; }
+        .btn-ya:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #059669; }
+        .btn-tidak { background: #ef4444; color: #fff; box-shadow: 0 5px 0 #b91c1c; }
+        .btn-tidak:hover { transform: translateY(-3px); box-shadow: 0 8px 0 #b91c1c; }
+
+        .result-card { background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 15px; border: 3px dashed #cbd5e1; margin-bottom: 20px; }
+        .score-grid { display: flex; justify-content: space-around; margin-top: 15px; }
+        .score-grid h3 { font-size: 2.2rem; font-family: 'Quicksand', sans-serif; font-weight: 700; }
+
+        @media (max-width: 500px) { 
+            .cards-grid { grid-template-columns: 1fr; } 
+            .card { height: 140px; } 
+            .option-text { font-size: 0.8rem; } 
+            .title { font-size: 1.8rem; } 
+            .container { padding: 20px 15px; } 
+            .opinion-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VIDEO BACKGROUND -->
+    <div class="video-background">
+        <video id="video-ibadah" autoplay loop muted playsinline>
+            <source src="assets/video.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="overlay"></div>
+    
+    <!-- AUDIO BACKGROUND -->
+    <audio id="bgm" src="assets/lagu.mp3" loop></audio>
+
+    <div class="container">
+        <!-- LAYAR 1: LOGIN -->
+        <div id="start-screen" class="screen active">
+            <div class="header-logo"><h2>GPI SIDANG GRANDVISTA</h2></div>
+            <div class="divider"></div>
+            <button id="btn-music" class="btn-music">🔊 Nyalakan Musik</button>
+            <h1 class="title">Kuis 3 Jenis Ibadah</h1>
+            <p class="subtitle">Paskah, Pondok Daun, & Pengumpulan Hasil</p>
+            <div class="input-group">
+                <input type="text" id="input-nama" placeholder="Nama Lengkap" required>
+                <input type="text" id="input-golongan" placeholder="Golongan Kaum" required>
+                <input type="text" id="input-token" placeholder="Token Kuis" required>
+            </div>
+            <button id="btn-start" class="btn btn-primary">Mulai Kuis</button>
+        </div>
+
+        <!-- LAYAR 2: PINTU GERBANG (GATEKEEPER) -->
+        <div id="gate-screen" class="screen">
+            <div class="header-logo"><h2>Pertanyaan Pembuka</h2></div>
+            <div class="divider"></div>
+            <h1 class="title">Gerbang Kuis</h1>
+            <p class="subtitle">Jawablah dengan benar untuk dapat masuk</p>
+            
+            <div id="gate-input-area">
+                <div class="input-group">
+                    <input type="text" id="input-gate" placeholder="Allah itu siapa?" required style="font-size: 1.2rem; text-transform: uppercase;">
+                </div>
+                <button id="btn-gate-submit" class="btn btn-primary">Kirim Jawaban</button>
+            </div>
+
+            <!-- Area Hitungan Mundur -->
+            <div id="countdown-container">
+                <div class="countdown-text">Kerjakan dengan sukacita ya</div>
+                <div id="countdown-number" class="countdown-number">5</div>
+            </div>
+        </div>
+
+        <!-- LAYAR 3: KUIS -->
+        <div id="quiz-screen" class="screen">
+            <div class="header-quiz">
+                <span id="peserta-info" class="badge">Peserta: -</span>
+                <span id="progress-info" class="badge">Soal 1/50</span>
+            </div>
+            
+            <!-- AYAT MAZMUR 119:130 -->
+            <div class="verse-box">
+                <p>"Bila tersingkap, firman-firman-Mu memberi terang, memberi pengertian kepada orang-orang bodoh."</p>
+                <span class="verse-ref">- Mazmur 119:130 -</span>
+            </div>
+
+            <h3 id="question-text" class="question">Memuat soal...</h3>
+            
+            <div id="cards-container" class="cards-grid"></div>
+            
+            <button id="btn-next" class="btn btn-success" style="display: none;">Lanjut ➡️</button>
+        </div>
+
+        <!-- LAYAR 4: PERTANYAAN PENDAPAT -->
+        <div id="opinion-screen" class="screen">
+            <div class="header-logo"><h2>Pertanyaan Terakhir</h2></div>
+            <div class="divider"></div>
+            
+            <h3 class="question" style="text-align: center; font-size: 1.3rem; border-left: none; border-bottom: 5px solid #14b8a6; border-radius: 15px;">
+                Apakah kamu sudah lahir dari benih Allah? Masuk dalam Gunung Sion?
+            </h3>
+            
+            <div class="opinion-grid">
+                <button class="btn btn-opinion btn-ya" onclick="submitOpinion('Iya')">IYA</button>
+                <button class="btn btn-opinion btn-tidak" onclick="submitOpinion('Tidak')">TIDAK</button>
+            </div>
+        </div>
+
+        <!-- LAYAR 5: HASIL -->
+        <div id="result-screen" class="screen">
+            <h2 style="color: #ffffff; text-shadow: 1px 1px 4px rgba(0,0,0,0.5); font-size: 2rem; margin-bottom: 10px; font-family: 'Playfair Display', serif;">Kuis Selesai! 🎉</h2>
+            <div class="result-card">
+                <h3 id="res-nama" style="font-size: 1.3rem; color: #1e293b; font-family: 'Quicksand', sans-serif;">Nama</h3>
+                <p id="res-golongan" style="color: #475569; font-weight: 700;">Golongan</p>
+                <div class="divider" style="background: #14b8a6;"></div>
+                <div class="score-grid">
+                    <div><p style="color:#475569; font-size:0.85rem; font-weight: 700;">BENAR</p><h3 id="res-benar" style="color:#10B981;">0</h3></div>
+                    <div><p style="color:#475569; font-size:0.85rem; font-weight: 700;">SALAH</p><h3 id="res-salah" style="color:#ef4444;">0</h3></div>
+                    <div><p style="color:#475569; font-size:0.85rem; font-weight: 700;">NILAI</p><h3 id="res-nilai" style="color:#0f766e;">0</h3></div>
+                </div>
+            </div>
+            <p style="color: #f1f5f9; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-size: 0.85rem; font-weight: 700;">Data telah otomatis masuk ke Panitia.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        // PENGATURAN GOOGLE FORMS & TOKEN
+        var FORM_ID = "1FAIpQLSfKdipJOh-xHDt1ot9FxodhRTYsa1dCfwRY-maDQsoYnLQfwg";
+        var ENTRY_NAMA = "entry.1460657046"; var ENTRY_GOLONGAN = "entry.93282975";
+        var ENTRY_TOKEN = "entry.70878547"; var ENTRY_NILAI = "entry.1471329933";
+        var ENTRY_BENAR = "entry.644547778"; var ENTRY_SALAH = "entry.289739470";
+        var ENTRY_DETAIL = "entry.1172364146";
+
+        var DAFTAR_TOKEN = ["YERUSALEM", "BETLEHEM", "NAZARET", "KAPERNAUM", "YERIKHO", "BABEL", "NINIWE", "TARSIS", "GOLGOTA", "EFESUS", "FILIPI", "KORINTUS", "ROMA", "ANTIOKHIA", "TROAS", "SINAI", "KANAAN", "YORDAN", "SAMARIA", "GALILEA"];
+
+        // 50 SOAL LENGKAP
+        var questions = [
+            { q: "Siapakah kelompok yang ditegaskan akan menang bersama-sama dengan Anak Domba (Wahyu 17:14)?", o: ["Mereka yang senantiasa mempersembahkan korban bakaran di pelataran Bait Suci", "Bangsa-bangsa dari seluruh penjuru bumi yang memilih untuk tidak ikut berperang", "Para pemimpin jemaat yang menjalankan seluruh aturan adat istiadat leluhur", "Mereka yang terpanggil, yang telah dipilih oleh Tuhan, dan yang terbukti setia", "Seluruh keturunan jasmani Israel yang berdiam di wilayah kota Yerusalem"], a: 3 },
+            { q: "Mengapa Anak Domba dipastikan sanggup mengalahkan pihak-pihak yang memerangi-Nya menurut kesaksian Wahyu 17:14?", o: ["Karena Ia adalah Tuan di atas segala tuan dan Raja di atas segala raja", "Karena Ia memiliki pasukan malaikat yang jumlahnya tidak dapat terhitung", "Karena Ia telah mengikat perjanjian damai dengan raja-raja di seluruh bumi", "Karena musuh-musuh-Nya telah menyerahkan senjata sebelum perang dimulai", "Karena benteng pertahanan umat-Nya dibangun di atas puncak gunung batu"], a: 0 },
+            { q: "Seruan suara dari sorga dalam Wahyu 18:4 bertujuan menghindarkan umat Tuhan dari dua hal utama, yaitu...", o: ["Kelaparan rohani yang berkepanjangan dan penganiayaan dari para penguasa dunia", "Kehilangan hak warisan tanah perjanjian dan terputusnya garis keturunan suku", "Mengambil bagian dalam dosa-dosanya dan turut ditimpa malapetaka-malapetakanya", "Keterlambatan dalam merayakan hari raya tahunan dan kewajiban korban api-apian", "Pertikaian antarsuku di padang gurun dan kekurangan bahan makanan jasmani"], a: 2 },
+            { q: "Perintah untuk keluar meninggalkan tempat yang penuh dosa agar terluput dari malapetaka dalam Wahyu 18:4 merupakan penggenapan rohani dari ibadah Paskah, yang secara arti melambangkan...", o: ["Perjalanan ziarah tahunan menuju kota Yerusalem untuk mempersembahkan hasil panen", "Upacara penyucian tubuh dengan air sebelum memasuki kemah pertemuan kudus", "Pembangunan kembali tembok-tembok kota yang runtuh akibat serangan bangsa asing", "Pengumpulan persepuluhan gandum dan anggur pada akhir musim bercocok tanam", "Tindakan memisahkan diri dari Babel rohani menuju keselamatan di dalam Kristus"], a: 4 },
+            { q: "Tahapan pertama yang selalu muncul terlebih dahulu sebelum terjadinya pembinasaan dalam Pola Penyelamatan adalah...", o: ["Turunnya hujan api dan belerang yang menghanguskan seluruh permukaan bumi", "Munculnya Pelita (Kemah Sementara) atau Kaki Dian yang membawa terang firman", "Berkumpulnya seluruh bangsa di pelataran Bait Suci untuk merayakan hari raya", "Peniupan sangkakala terakhir yang mengakhiri seluruh masa pelayanan di bumi", "Berhentinya turunnya manna dari sorga sebagai tanda masuk ke tanah perjanjian"], a: 1 },
+            { q: "Setelah munculnya Pelita atau Kaki Dian, peristiwa tahap kedua yang muncul adalah...", o: ["Pengumpulan seluruh hasil tuaian gandum ke dalam lumbung sorgawi", "Penobatan para imam besar untuk melayani di dalam tempat maha kudus", "Turunnya kota Yerusalem baru secara langsung dari sorga ke atas bumi", "Munculnya peristiwa pembinasaan yang dilambangkan dengan ular beludak", "Pembagian tanah pusaka kepada kedua belas suku Israel di tanah Kanaan"], a: 3 },
+            { q: "Pada kedatangan Yesus ke-2 muncul penyelamatan yaitu...", o: ["Dia yang menang sebagaimana dijanjikan Tuhan di dalam kitab Wahyu", "Nabi Musa yang memimpin umat keluar dari perbudakan bangsa Mesir", "Malaikat penghancur yang memegang cawan murka Allah di tangannya", "Imam besar Harun yang mempersembahkan korban penghapus dosa tahunan", "Raja Daud yang memulihkan kembali kejayaan takhta kerajaan Israel"], a: 0 },
+            { q: "Apa arti rohani dari dijadikannya seseorang sebagai 'sokoguru di dalam Bait Suci Allah' (Wahyu 3:12)?", o: ["Menjadi penjaga pintu gerbang luar yang bertugas memeriksa setiap tamu", "Memperoleh hak untuk membangun gedung ibadah baru di berbagai wilayah", "Menjadi tiang penopang rohani yang teguh dan tinggal selamanya di rumah Allah", "Mendapatkan kedudukan tertinggi dalam pemerintahan dunia pada akhir zaman", "Dibebaskan dari segala tanggung jawab pelayanan dan pengajaran firman"], a: 2 },
+            { q: "Menurut Wahyu 3:12, tiga hal yang akan dituliskan pada diri orang yang menang adalah...", o: ["Nama kedua belas rasul, nama kitab kehidupan, dan nama tanah perjanjian", "Nama malaikat penghulu, nama suku-suku Israel, dan nama takhta kemuliaan", "Nama para nabi perjanjian lama, nama bait suci Salomo, dan nama raja Daud", "Nama hari raya Paskah, nama hari raya Pondok Daun, dan nama hari raya Penuaian", "Nama Allah-Ku, nama kota Allah-Ku yaitu Yerusalem baru, dan nama-Ku yang baru"], a: 4 },
+            { q: "Perintah dalam Wahyu 10:11 ('Engkau harus bernubuat lagi kepada banyak bangsa...') menegaskan mandat untuk...", o: ["Menutup seluruh gulungan kitab nubuat karena waktu telah berakhir", "Menyampaikan kesaksian firman nubuat yang telah tergenap kepada dunia", "Menerjemahkan hukum Taurat ke dalam berbagai bahasa kuno di Timur Tengah", "Mengumpulkan pajak persembahan dari para raja untuk pembangunan Bait Suci", "Memimpin pemberontakan politik melawan kekuasaan raja-raja di bumi"], a: 1 },
+            { q: "Siapakah sebenarnya yang mengutus malaikat tersebut menurut Wahyu 22:16?", o: ["Tua-tua yang duduk mengelilingi takhta kemuliaan di dalam sorga", "Nabi Musa dan Elia yang menampakkan diri di atas puncak gunung", "Keempat makhluk hidup yang berada di tengah-tengah takhta Allah", "Yesus, tunas keturunan Daud dan bintang timur yang gilang-gemilang", "Para rasul Anak Domba yang namanya tertulis pada batu dasar kota"], a: 3 },
+            { q: "Yesus menyatakan tujuan Ia mengutus malaikat-Nya untuk memberi kesaksian tentang semuanya ini kepada Yohanes adalah...", o: ["Untuk disampaikan bagi jemaat-jemaat sebagai kesaksian kebenaran", "Sebagai rahasia pribadi yang hanya boleh disimpan oleh Yohanes seorang diri", "Sebagai peringatan khusus hanya bagi para imam di Bait Suci Yerusalem", "Untuk menggantikan seluruh ajaran dalam kitab-kitab Injil sebelumnya", "Sebagai catatan sejarah bagi para sejarawan kerajaan Romawi kuno"], a: 0 },
+            { q: "Mengapa kitab Wahyu pasal 2 dan 3 ditekankan untuk dibaca secara individu oleh setiap orang percaya?", o: ["Karena pasal tersebut berisi daftar silsilah keluarga yang bersifat rahasia", "Karena pasal tersebut tidak boleh dibacakan di dalam pertemuan ibadah umum", "Karena berisi evaluasi kondisi rohani, teguran, dan janji bagi pemenang pribadi", "Karena berisi tata cara penyembelihan domba Paskah di rumah masing-masing", "Karena pasal tersebut hanya ditujukan kepada para pemimpin negara masa lalu"], a: 2 },
+            { q: "Menurut ketetapan dalam Imamat 23:34, kapan dan berapa lama umat Israel diperintahkan untuk merayakan Hari Raya Pondok Daun?", o: ["Pada hari kesepuluh bulan pertama selama lima hari berturut-turut", "Pada hari keempat belas bulan kedua selama delapan hari penuh", "Pada hari pertama bulan ketujuh selama empat puluh hari lamanya", "Pada hari kelima belas bulan ketiga selama tiga hari berturut-turut", "Pada hari kelima belas bulan yang ketujuh selama tujuh hari lamanya"], a: 4 },
+            { q: "Dalam Imamat 23:35-36, apa ketetapan khusus yang harus dilakukan umat pada hari yang pertama dan hari yang kedelapan?", o: ["Mengelilingi tembok kota sebanyak tujuh kali sambil meniup sangkakala", "Mengadakan pertemuan kudus dan dilarang melakukan sesuatu pekerjaan berat", "Berpuasa penuh dari pagi hingga matahari terbenam tanpa makan dan minum", "Membongkar seluruh kemah perkemahan dan kembali ke rumah masing-masing", "Menaburkan abu lembu merah ke seluruh batas wilayah tanah perjanjian"], a: 1 },
+            { q: "Bagaimana sebutan khusus yang diberikan Firman Tuhan untuk hari yang kedelapan dalam perayaan Pondok Daun (Imamat 23:36)?", o: ["Hari raya pendamaian agung bagi seluruh bangsa", "Hari raya roti tidak beragi di tanah perjanjian", "Hari raya peniupan sangkakala pada awal bulan", "Hari raya perkumpulan yang kudus bagi Tuhan", "Hari raya buah bungaran dari hasil panen ladang"], a: 3 },
+            { q: "Dalam Zakaria 14:16 dinubuatkan bahwa semua orang akan datang tahun demi tahun ke Yerusalem untuk dua tujuan utama, yaitu...", o: ["Sujud menyembah kepada Raja, Tuhan semesta alam, dan merayakan Pondok Daun", "Membayar upeti perak dan emas serta membangun kembali tembok Yerusalem", "Mempelajari bahasa Ibrani dan menyalin seluruh gulungan kitab Taurat Musa", "Menyerahkan seluruh persenjataan perang dan mengadakan perjanjian dagang", "Menggantikan tugas para imam Lewi dalam mempersembahkan korban bakaran"], a: 0 },
+            { q: "Apa konsekuensi atau hukuman yang ditetapkan Tuhan dalam Zakaria 14:17 bagi kaum-kaum di bumi yang tidak mau datang ke Yerusalem?", o: ["Tanah mereka akan diguncang gempa bumi yang menghancurkan seluruh kota", "Seluruh ternak mereka akan mati terserang wabah penyakit yang mematikan", "Kepada mereka tidak akan turun hujan sebagai tanda tertahannya berkat", "Mereka akan dibuang ke negeri asing selama tujuh puluh tahun lamanya", "Matahari tidak akan bersinar di wilayah mereka selama tujuh bulan penuh"], a: 2 },
+            { q: "Mengapa Zakaria 14:18 menyebutkan secara spesifik kaum Mesir akan ditimpa tulah yang sama jika tidak datang merayakan Hari Raya Pondok Daun?", o: ["Karena kaum Mesir telah berjanji untuk tidak lagi keluar dari batas negerinya", "Karena sungai Nil di Mesir telah mengering sebelum masa kerajaan seribu tahun", "Karena orang Mesir memiliki tata cara perayaan yang berbeda dari ketetapan Musa", "Karena letak geografis Mesir berbatasan langsung dengan kota Yerusalem utara", "Karena tidak ada satu bangsa pun yang lolos dari hukuman dosa jika menolaknya"], a: 4 },
+            { q: "Dari bahan apakah Musa membangun pondok-pondok sementara bagi umat Israel ketika keluar dari Mesir?", o: ["Dari batu-batu gunung Sinai yang dipahat dan disusun dengan sangat rapi", "Dari rumput yang tumbuh di padang sebagai tempat bernaung sementara", "Dari kulit binatang korban bakaran yang telah dikeringkan di bawah terik matahari", "Dari kayu aras Libanon yang dibawa oleh para pemimpin suku dari tanah Kanaan", "Dari kain lenan halus yang ditenun oleh para perempuan di perkemahan Israel"], a: 1 },
+            { q: "Perumpamaan 'rumput' yang digunakan untuk membangun pondok memiliki dua arti rohani utama, yaitu...", o: ["Kekayaan duniawi dan kemegahan kerajaan-kerajaan di seluruh muka bumi", "Malaikat di sorga dan bintang-bintang yang bersinar di cakrawala", "Hukum Taurat Musa dan kitab para nabi dalam Perjanjian Lama", "Manusia dan Bait Suci sebagai tempat kediaman Allah yang kudus", "Makanan jasmani sehari-hari dan minuman anggur dalam perjamuan"], a: 3 },
+            { q: "Ayat manakah yang menjadi dasar kebenaran bahwa seluruh umat manusia diumpamakan seperti rumput dan kemuliaannya seperti bunga di padang?", o: ["Yesaya 40:6-7 dan 1 Petrus 1:24", "Kejadian 1:26-27 dan Keluaran 20:1-3", "Mazmur 23:1-4 dan Amsal 3:5-6", "Yeremia 29:11-13 dan Yehezkiel 37:1-5", "Roma 8:28-30 dan Galatia 5:22-23"], a: 0 },
+            { q: "Makna rohani dari perumpamaan 'semua yang hidup adalah seperti rumput' (1 Petrus 1:24) bagi kehidupan orang percaya adalah...", o: ["Manusia memiliki kekuatan kekal di dalam dirinya tanpa memerlukan firman Tuhan", "Umat Tuhan tidak perlu memelihara tubuh jasmani karena tubuh akan segera binasa", "Kemuliaan manusia secara daging bersifat fana, sehingga hanya firman yang kekal", "Seluruh ciptaan di alam semesta akan berubah menjadi padang rumput pada akhir zaman", "Orang percaya dilarang memiliki pekerjaan atau usaha bercocok tanam di dunia ini"], a: 2 },
+            { q: "Apa inti teguran Yesus kepada orang Farisi dalam Matius 15:3?", o: ["Mereka terlalu sering mengadakan perjamuan makan bersama orang-orang berdosa", "Mereka tidak mengerti tata cara mencuci tangan yang benar menurut aturan kebersihan", "Mereka menolak memberikan persembahan persepuluhan dari hasil kebun mereka", "Mereka melarang para murid untuk berdoa syukur sebelum menyantap makanan", "Mereka melanggar perintah Allah demi mempertahankan adat istiadat nenek moyang"], a: 4 },
+            { q: "Contoh nyata pelanggaran perintah Allah demi adat istiadat nenek moyang yang dikecam oleh Yesus dalam Matius 15:4-5 adalah...", o: ["Melakukan perjalanan jauh pada hari Sabat melebihi batas jarak yang ditentukan", "Mengabaikan pemeliharaan ayah dan ibu dengan dalih harta telah dipersembahkan", "Menyembelih hewan korban sembelihan di luar pelataran Bait Suci Yerusalem", "Menikah dengan penduduk asing yang berasal dari luar kedua belas suku Israel", "Tidak mengenakan jubah berjumbai saat menghadiri pertemuan di rumah ibadat"], a: 1 },
+            { q: "Bagaimana keterkaitan antara 1 Korintus 3:17 ('bait Allah itu ialah kamu') dengan makna rohani Hari Raya Pondok Daun?", o: ["Umat percaya wajib membangun gedung gereja fisik dengan biaya yang sangat mahal", "Hanya bangunan Bait Suci di Yerusalem yang memiliki kekudusan mutlak di hadapan Allah", "Orang yang merusak tanaman rumput di sekitar tempat ibadah akan dihukum mati", "Diri orang percaya adalah Bait Suci Allah yang kudus tempat Tuhan berdiam", "Pondok daun fisik yang dibangun setiap tahun memiliki kuasa untuk mengampuni dosa"], a: 3 },
+            { q: "Berdasarkan gabungan makna Yesaya 40:6-7, 1 Petrus 1:24, dan 1 Korintus 3:17, arti rohani dari merayakan Hari Raya Pondok Daun pada masa kegenapan adalah...", o: ["Mengumpulkan manusia (rumput) yang dibaharui firman menjadi Bait Suci Allah", "Mendirikan tenda-tenda perkemahan di halaman rumah selama tujuh hari setiap bulan Juli", "Mengadakan festival panen raya untuk memamerkan hasil pertanian terbaik dari setiap daerah", "Mengenang kembali penderitaan nenek moyang bangsa Israel saat tersesat di padang gurun", "Melakukan upacara pembakaran rumput kering sebagai lambang penghapusan masa lalu"], a: 0 },
+            { q: "Dalam kerangka Hari Raya Pengumpulan Hasil, 'Rumah' yang kemegahannya kemudian melebihi yang semula (Hagai 2:9-10) menunjuk pada...", o: ["Istana kerajaan Salomo yang seluruh dindingnya dilapisi emas murni dari Ofir", "Gedung perbendaharaan negara yang menyimpan seluruh cadangan perak dan emas", "Bait Suci rohani yang dibangun dari umat hasil penuaian yang dipenuhi damai sejahtera", "Kemah suci portabel yang dibuat oleh Bezaleel dan Aholiab di padang gurun", "Menara pengawas yang didirikan di atas bukit Sion untuk memantau gerak musuh"], a: 2 },
+            { q: "Menurut Keluaran 23:16, terdapat dua hari raya pertanian yang diperintahkan Tuhan untuk dipelihara oleh umat-Nya, yaitu...", o: ["Hari raya penaburan benih pada awal musim dingin dan hari raya pembajakan tanah", "Hari raya pemangkasan pohon anggur dan hari raya penyimpanan minyak zaitun", "Hari raya Sabat tahun ketujuh dan hari raya tahun Yobel kelima puluh", "Hari raya pendamaian tahunan dan hari raya penahbisan mezbah korban bakaran", "Hari raya menuai buah bungaran dan hari raya pengumpulan hasil pada akhir tahun"], a: 4 },
+            { q: "Dalam Bilangan 19:6, tiga benda apakah yang harus diambil oleh imam dan dilemparkan ke tengah-tengah api yang membakar habis lembu merah?", o: ["Kemenyan, mur, dan minyak urapan kudus", "Kayu aras, hisop, dan kain kirmizi", "Tepung terbaik, ragi, dan madu hutan", "Batu permata, perak, dan lempengan emas", "Daun palem, ranting zaitun, dan bunga bakung"], a: 1 },
+            { q: "Apa status yang dialami oleh imam dan orang yang membakar habis lembu tersebut setelah mereka mencuci pakaian dan membasuh tubuh (Bilangan 19:7-8)?", o: ["Mereka langsung menjadi tahir dan boleh memasuki ruang maha kudus", "Mereka harus tinggal di luar perkemahan selama tujuh hari penuh", "Mereka dibebaskan dari segala tugas pelayanan selama satu bulan penuh", "Mereka tetap dinyatakan najis oleh Tuhan sampai matahari terbenam", "Mereka wajib mempersembahkan seekor domba jantan sebagai tebusan"], a: 3 },
+            { q: "Berdasarkan Bilangan 19:9, siapakah yang bertugas mengumpulkan abu lembu pembakaran tersebut, di mana abu itu diletakkan, dan apa kegunaan utamanya?", o: ["Seorang yang tahir mengumpulkannya, ditaruh di tempat tahir, untuk air pentahiran", "Imam besar mengumpulkannya, ditaruh di atas mezbah ukupan, untuk penobatan raja", "Kepala suku Lewi mengumpulkannya, ditaruh di dalam tabut perjanjian, sebagai peringatan", "Orang yang membakar lembu mengumpulkannya, ditaruh di gerbang kota, untuk menyuburkan ladang", "Para tua-tua Israel mengumpulkannya, ditaburkan di sungai Yordan, untuk menyucikan sungai"], a: 0 },
+            { q: "Peristiwa penting apakah yang terjadi di Gilgal tepat pada keesokan harinya setelah orang Israel merayakan Paskah dan memakan hasil tanah Kanaan (Yosua 5:10-12)?", o: ["Tiang awan dan tiang api kembali menutupi seluruh perkemahan bangsa Israel", "Tembok kota Yerikho langsung runtuh seketika tanpa dikelilingi oleh pasukan", "Berhentilah turunnya manna, sehingga mereka makan hasil yang dihasilkan tanah Kanaan", "Seluruh umat Israel kembali menyeberangi sungai Yordan menuju padang gurun", "Musa menampakkan diri untuk memberkati kedua belas suku sebelum berperang"], a: 2 },
+            { q: "Apa arti rohani dari berhentinya manna dan mulainya bangsa Israel memakan hasil negeri Kanaan (Yosua 5:11-12)?", o: ["Tuhan tidak lagi memelihara umat-Nya setelah mereka berhasil memasuki tanah perjanjian", "Makanan jasmani jauh lebih penting daripada firman yang turun dari sorga", "Umat percaya tidak lagi membutuhkan pengajaran firman setelah dibaptis", "Pertanian fisik merupakan satu-satunya cara untuk memperoleh keselamatan kekal", "Peralihan dari pemeliharaan di padang gurun menuju menikmati hasil tuaian yang matang"], a: 4 },
+            { q: "Dalam proses pengumpulan hasil rohani, urutan dua perumpamaan Yesus dalam Matius pasal 13 yang menjadi landasan kronologi penuaian adalah...", o: ["Perumpamaan tentang mutiara yang berharga dan perumpamaan tentang pukat yang dilabuhkan", "Perumpamaan tentang seorang penabur dan perumpamaan lalang di antara gandum", "Perumpamaan tentang gadis-gadis yang bijaksana dan perumpamaan tentang talenta", "Perumpamaan tentang domba yang hilang dan perumpamaan tentang dirham yang hilang", "Perumpamaan tentang pekerja di kebun anggur dan perumpamaan tentang penggarap kebun"], a: 1 },
+            { q: "Berdasarkan Perumpamaan tentang Seorang Penabur, benih yang ditaburkan di berbagai jenis tanah melambangkan...", o: ["Harta kekayaan materi yang dibagikan kepada orang-orang miskin", "Hukum adat istiadat yang diwariskan oleh para leluhur Israel", "Perbuatan baik dan amal sosial yang dilakukan manusia di dunia", "Firman tentang Kerajaan Sorga (firman kebenaran dari Tuhan)", "Keturunan jasmani dari kedua belas suku bangsa Israel kuno"], a: 3 },
+            { q: "Dalam Perumpamaan Lalang di antara Gandum, siapakah yang menaburkan benih baik dan siapakah yang menaburkan benih lalang di ladang dunia ini?", o: ["Benih baik ditaburkan oleh Anak Manusia, sedangkan lalang ditaburkan oleh si jahat (Iblis)", "Benih baik ditaburkan oleh para nabi, sedangkan lalang ditaburkan oleh para imam", "Benih baik ditaburkan oleh malaikat, sedangkan lalang ditaburkan oleh manusia yang lalai", "Benih baik ditaburkan oleh bangsa Israel, sedangkan lalang ditaburkan oleh bangsa Mesir", "Benih baik ditaburkan oleh rasul Petrus, sedangkan lalang ditaburkan oleh ahli Taurat"], a: 0 },
+            { q: "Paskah melambangkan darah Anak Domba yang menyelamatkan dari maut. Siapakah Anak Domba yang dimaksud?", o: ["Daud", "Musa", "Yesus Kristus", "Abraham", "Yohanes Pembaptis"], a: 2 },
+            { q: "Hari Raya Pengumpulan Hasil (Penuaian) merayakan panen apa pada akhir tahun?", o: ["Panen buah zaitun", "Panen gandum dan anggur", "Panen buah ara", "Hasil bumi/pertanian", "Panen ternak"], a: 3 },
+            { q: "Siapakah yang menulis kitab Wahyu?", o: ["Paulus", "Petrus", "Matius", "Yohanes", "Lukas"], a: 3 },
+            { q: "Dalam Wahyu 3:12, orang yang menang akan dijadikan 'sokoguru' di Bait Suci Allah. Artinya, orang tersebut...", o: ["Diangkat menjadi malaikat", "Menjadi tiang penopang rohani yang teguh dan kekal di rumah Allah", "Menjadi pemimpin negara di dunia", "Mendapatkan mahkota emas", "Dibebaskan dari hukuman dosa"], a: 1 },
+            { q: "Dalam Wahyu 18:4, umat Tuhan diserukan untuk keluar dari tempat yang penuh dosa. Tempat tersebut dilambangkan sebagai...", o: ["Yerusalem", "Niniwe", "Babel rohani", "Sodom dan Gomora", "Mesir"], a: 2 },
+            { q: "Menurut Imamat 23:42, siapakah yang harus tinggal di dalam pondok-pondok selama tujuh hari perayaan Pondok Daun?", o: ["Hanya para imam dan orang Lewi", "Hanya bangsa asing yang ada di Israel", "Seluruh umat Israel asli (termasuk keturunan mereka)", "Hanya para nabi dan raja", "Hanya kaum pria dewasa"], a: 2 },
+            { q: "Apa yang dilakukan bangsa Israel selama 40 tahun di padang gurun terkait Pondok Daun?", o: ["Mereka tinggal di rumah-rumah batu", "Mereka tinggal di dalam kemah/pondok sementara", "Mereka membangun Bait Suci", "Mereka tinggal di gua-gua", "Mereka menetap di satu kota"], a: 1 },
+            { q: "Lembu merah yang dibakar dalam Bilangan 19 melambangkan apa?", o: ["Kemuliaan manusia", "Korban Kristus yang sempurna dan tidak bercacat", "Kekayaan dunia", "Kekuatan raja", "Dosa bangsa Israel"], a: 1 },
+            { q: "Bahan utama pondok sementara yang dibangun Musa di padang gurun adalah...", o: ["Kayu jati", "Batu bata", "Rumput", "Kain sutra", "Daun palem"], a: 2 },
+            { q: "Siapa yang berhak mengumpulkan abu lembu merah untuk air pentahiran (Bilangan 19:9)?", o: ["Orang yang najis", "Seorang yang tahir", "Imam besar saja", "Raja", "Nabi"], a: 1 },
+            { q: "Apa yang terjadi dengan manna ketika bangsa Israel mulai memakan hasil tanah Kanaan di Gilgal (Yosua 5:12)?", o: ["Manna berubah rasa", "Manna berhenti turun", "Manna menjadi banyak", "Manna berubah warna", "Manna membusuk"], a: 1 },
+            { q: "Perumpamaan Yesus tentang seorang penabur dan lalang di antara gandum terdapat dalam kitab...", o: ["Markus", "Lukas", "Matius", "Yohanes", "Kisah Para Rasul"], a: 2 },
+            { q: "Dalam perumpamaan lalang, siapa yang menaburkan lalang di ladang dunia?", o: ["Anak Manusia", "Para malaikat", "Iblis (si jahat)", "Para nabi palsu", "Orang Farisi"], a: 2 },
+            { q: "Karakteristik utama dari 'Firman Tersingkap' (seperti kuis ini) adalah...", o: ["Menyembunyikan rahasia", "Membuka dan menjelaskan makna rohani dari nubuat Alkitab", "Hanya membaca teks secara harfiah", "Mengabaikan Perjanjian Lama", "Mengubah isi Alkitab"], a: 1 },
+            { q: "Kedatangan Yesus Kristus yang kedua kali sering digambarkan sebagai...", o: ["Musim tanam", "Musim hujan", "Penuaian akhir zaman (pengumpulan hasil)", "Pesta pora", "Perang dunia"], a: 2 },
+            { q: "Yesus mengutus malaikat-Nya kepada Yohanes agar kesaksian tersebut disampaikan kepada...", o: ["Para raja dunia", "Jemaat-jemaat (Gereja)", "Para imam Yahudi", "Bangsa Romawi", "Para malaikat lain"], a: 1 }
+        ];
+
+        // LOGIKA KUIS, KARTU, & SUARA (SFX)
+        var currentIdx = 0, score = 0, canClick = false, detailJawaban = [];
+        var namaPeserta, golonganPeserta, tokenPeserta;
+        var bgmAudio = document.getElementById('bgm');
+        var audioCtx = null; 
+
+        function initAudio() {
+            if (!audioCtx) { 
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+            } else if (audioCtx.state === 'suspended') {
+                audioCtx.resume(); 
+            }
+        }
+
+        // SFX BENAR
+        function playCorrectSound() {
+            if(!audioCtx) return;
+            var now = audioCtx.currentTime;
+            var osc1 = audioCtx.createOscillator();
+            var gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(800, now);
+            osc1.frequency.exponentialRampToValueAtTime(3000, now + 0.3);
+            osc1.connect(gain1); gain1.connect(audioCtx.destination);
+            gain1.gain.setValueAtTime(0.3, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc1.start(now); osc1.stop(now + 0.4);
+
+            var notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach(function(freq, i) {
+                var osc = audioCtx.createOscillator();
+                var gain = audioCtx.createGain();
+                osc.type = 'triangle'; osc.frequency.value = freq;
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0, now + (i*0.05));
+                gain.gain.linearRampToValueAtTime(0.4, now + (i*0.05) + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                osc.start(now + (i*0.05)); osc.stop(now + 1.0);
+            });
+        }
+
+        // SFX SALAH
+        function playWrongSound() {
+            if(!audioCtx) return;
+            var now = audioCtx.currentTime;
+            var osc1 = audioCtx.createOscillator();
+            var gain1 = audioCtx.createGain();
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(1200, now);
+            osc1.frequency.exponentialRampToValueAtTime(150, now + 0.5);
+            osc1.connect(gain1); gain1.connect(audioCtx.destination);
+            gain1.gain.setValueAtTime(0.4, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+            osc1.start(now); osc1.stop(now + 0.6);
+
+            var osc2 = audioCtx.createOscillator();
+            var gain2 = audioCtx.createGain();
+            osc2.type = 'square';
+            osc2.frequency.setValueAtTime(80, now);
+            osc2.frequency.linearRampToValueAtTime(30, now + 0.6);
+            osc2.connect(gain2); gain2.connect(audioCtx.destination);
+            gain2.gain.setValueAtTime(0.5, now);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+            osc2.start(now); osc2.stop(now + 0.7);
+        }
+
+        // Tombol Musik
+        document.getElementById('btn-music').onclick = function() {
+            initAudio();
+            if (bgmAudio) { 
+                if (bgmAudio.paused) {
+                    bgmAudio.volume = 0.5; 
+                    bgmAudio.play().then(() => { 
+                        this.innerHTML = "🔇 Matikan Musik"; 
+                    }).catch(e => console.log("Gagal memutar audio:", e)); 
+                } else {
+                    bgmAudio.pause();
+                    this.innerHTML = "🔊 Nyalakan Musik";
+                }
+            }
+        };
+
+        // TOMBOL MULAI KUIS (Cek Musik & Pindah ke Gate Screen)
+        document.getElementById('btn-start').onclick = function() {
+            initAudio();
+            
+            // CEK APAKAH MUSIK SUDAH NYALA
+            if (bgmAudio && bgmAudio.paused) {
+                alert("Eits, tunggu dulu! Silakan klik tombol '🔊 Nyalakan Musik' terlebih dahulu untuk memulai kuis.");
+                return;
+            }
+
+            namaPeserta = document.getElementById('input-nama').value.trim();
+            golonganPeserta = document.getElementById('input-golongan').value.trim();
+            tokenPeserta = document.getElementById('input-token').value.trim().toUpperCase(); 
+
+            if (!namaPeserta || !golonganPeserta || !tokenPeserta) { alert("Isi semua data diri dan Token Kuis!"); return; }
+            if (!DAFTAR_TOKEN.includes(tokenPeserta)) { alert("Token tidak valid atau sudah digunakan!"); return; }
+
+            // Jika valid, pindah ke layar GATEKEEPER
+            document.getElementById('start-screen').classList.remove('active'); 
+            document.getElementById('gate-screen').classList.add('active');
+        };
+
+        // LOGIKA PINTU GERBANG (ALLAAH ITU SIAPA?)
+        document.getElementById('btn-gate-submit').onclick = function() {
+            var gateAnswer = document.getElementById('input-gate').value.trim().toUpperCase();
+            
+            if (gateAnswer === "FIRMAN") {
+                // Sembunyikan input, tampilkan countdown
+                document.getElementById('gate-input-area').style.display = 'none';
+                document.getElementById('countdown-container').style.display = 'block';
+                
+                var count = 5;
+                var countdownEl = document.getElementById('countdown-number');
+                countdownEl.innerText = count;
+
+                var timer = setInterval(function() {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.innerText = count;
+                    } else {
+                        clearInterval(timer);
+                        // Pindah ke layar KUIS
+                        document.getElementById('gate-screen').classList.remove('active');
+                        document.getElementById('quiz-screen').classList.add('active');
+                        document.getElementById('peserta-info').textContent = namaPeserta;
+                        currentIdx = 0; score = 0; detailJawaban = [];
+                        loadQuestion();
+                    }
+                }, 1000);
+
+            } else {
+                alert("Jawaban Salah! Silakan coba lagi.");
+                document.getElementById('input-gate').value = "";
+            }
+        };
+
+        function loadQuestion() {
+            canClick = true;
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('progress-info').textContent = "Soal " + (currentIdx + 1) + " / " + questions.length;
+            
+            var q = questions[currentIdx];
+            document.getElementById('question-text').textContent = q.q;
+            
+            var container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            var cardLetters = ["A", "B", "C", "D", "E"];
+            q.o.forEach((opt, i) => {
+                var card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="letter-badge">${cardLetters[i]}</div>
+                            <div class="option-text">${opt}</div>
+                        </div>
+                        <div class="card-back" id="back-${i}"></div>
+                    </div>
+                `;
+                card.onclick = () => flipCard(i, card);
+                container.appendChild(card);
+            });
+        }
+
+        function flipCard(selectedIndex, cardElement) {
+            if (!canClick) return; 
+            canClick = false;
+
+            var q = questions[currentIdx];
+            var allCards = document.querySelectorAll('.card');
+            var backSelected = cardElement.querySelector('.card-back');
+            
+            cardElement.classList.add('flipped');
+
+            setTimeout(() => {
+                if (selectedIndex === q.a) {
+                    backSelected.innerHTML = "✅";
+                    cardElement.classList.add('correct');
+                    score++;
+                    detailJawaban.push("Soal " + (currentIdx + 1) + ": Benar");
+                    
+                    playCorrectSound(); 
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+                    
+                } else {
+                    backSelected.innerHTML = "❌";
+                    cardElement.classList.add('wrong');
+                    detailJawaban.push("Soal " + (currentIdx + 1) + ": Salah");
+                    
+                    playWrongSound(); 
+                    
+                    var correctCard = allCards[q.a];
+                    var backCorrect = correctCard.querySelector('.card-back');
+                    backCorrect.innerHTML = "✅";
+                    correctCard.classList.add('flipped');
+                    setTimeout(() => { correctCard.classList.add('correct'); }, 300);
+                }
+
+                document.getElementById('btn-next').style.display = 'block';
+                document.getElementById('btn-next').onclick = function() {
+                    currentIdx++;
+                    if (currentIdx < questions.length) { 
+                        loadQuestion(); 
+                    } else { 
+                        // JIKA SOAL 50 SELESAI, PINDAH KE LAYAR PENDAPAT
+                        document.getElementById('quiz-screen').classList.remove('active');
+                        document.getElementById('opinion-screen').classList.add('active');
+                    }
+                };
+            }, 600); 
+        }
+
+        // LOGIKA PERTANYAAN PENDAPAT TERAKHIR
+        function submitOpinion(answer) {
+            // Simpan jawaban pendapat ke dalam detail untuk Google Form
+            detailJawaban.push("Pertanyaan Pendapat (Lahir dari Benih Allah?): " + answer);
+            
+            // Pindah ke Layar Hasil
+            document.getElementById('opinion-screen').classList.remove('active'); 
+            showResult();
+        }
+
+        function showResult() {
+            if (bgmAudio) bgmAudio.pause(); // Musik mati saat kuis selesai
+            document.getElementById('result-screen').classList.add('active');
+            
+            var nilai = Math.round((score / questions.length) * 100);
+            var totalSalah = questions.length - score;
+
+            document.getElementById('res-nama').textContent = namaPeserta;
+            document.getElementById('res-golongan').textContent = golonganPeserta;
+            document.getElementById('res-benar').textContent = score;
+            document.getElementById('res-salah').textContent = totalSalah;
+            document.getElementById('res-nilai').textContent = nilai;
+            
+            if (nilai >= 80) confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            
+            // KIRIM DATA KE GOOGLE FORMS
+            var formData = new URLSearchParams();
+            formData.append(ENTRY_NAMA, namaPeserta); formData.append(ENTRY_GOLONGAN, golonganPeserta);
+            formData.append(ENTRY_TOKEN, tokenPeserta); formData.append(ENTRY_NILAI, nilai);
+            formData.append(ENTRY_BENAR, score); formData.append(ENTRY_SALAH, totalSalah);
+            formData.append(ENTRY_DETAIL, detailJawaban.join("\n"));
+            
+            fetch("https://docs.google.com/forms/d/e/" + FORM_ID + "/formResponse", { 
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() 
+            }).catch(function(err) { console.log("Gagal mengirim data: ", err); });
+        }
+    </script>
+</body>
+</html>
